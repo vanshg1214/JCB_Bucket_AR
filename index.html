@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JCB Web AR Service</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <h1>JCB Product Demo</h1>
+        <p>Zero-Configuration Web AR Experience</p>
+      </header>
+      
+      <main class="product-card">
+        <model-viewer
+          src="/models/jcb_435b_loader.glb"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          ar-scale="fixed"
+          ar-placement="floor"
+          camera-controls
+          touch-action="pan-y"
+          shadow-intensity="1"
+          alt="JCB 435B Loader in AR"
+        >
+          <button slot="ar-button" class="ar-button">
+            View in your space
+          </button>
+        </model-viewer>
+      </main>
+
+      <footer class="app-footer">
+        <p>Tested for strict ground locking and 1:1 real-world scaling.</p>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

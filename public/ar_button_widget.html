@@ -1,0 +1,292 @@
+<!-- 
+  JCB STANDALONE AR BUTTON WIDGET
+  =========================================
+  Copy and paste this code snippet anywhere on any website (Wix, WordPress, Shopify, custom HTML, etc.).
+  It will render a premium, responsive AR button. 
+  - On Mobile (iOS/Android): Clicking it directly launches the native AR camera (Scene Viewer/Quick Look) for the JCB.
+  - On Desktop/Laptop: Clicking it opens a sleek, glassmorphic QR code modal so clients can scan and view it instantly on their phones.
+-->
+
+<div id="jcb-ar-widget-root">
+  <!-- The Visible Premium AR Button -->
+  <button id="jcb-ar-trigger-btn" class="jcb-ar-premium-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="jcb-ar-icon">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+    </svg>
+    <span>View JCB in AR</span>
+  </button>
+
+  <!-- Hidden Model-Viewer (Handles native AR launching and USDZ compilation dynamically) -->
+  <model-viewer
+    id="jcb-hidden-viewer"
+    src="https://vanshg1214.github.io/JCB_AR/models/scene_fixed.glb"
+    ar
+    ar-modes="scene-viewer quick-look"
+    ar-scale="fixed"
+    ar-placement="floor"
+    style="width: 1px; height: 1px; position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;"
+  >
+  </model-viewer>
+
+  <!-- Premium QR Code Modal for Desktop Fallback -->
+  <div id="jcb-qr-modal" class="jcb-modal-overlay">
+    <div class="jcb-modal-content">
+      <button id="jcb-modal-close" class="jcb-close-btn">&times;</button>
+      
+      <div class="jcb-modal-header">
+        <h3>Scan to View JCB in AR</h3>
+        <p>Experience the 4-meter loader at 1:1 scale in your real-world environment.</p>
+      </div>
+      
+      <div class="jcb-qr-wrapper">
+        <!-- Generates a dynamic QR code pointing to the live GitHub Pages site -->
+        <img 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://vanshg1214.github.io/JCB_AR/&color=000000&bgcolor=ffffff&qzone=2" 
+          alt="QR Code to scan" 
+          class="jcb-qr-image"
+        />
+      </div>
+      
+      <div class="jcb-modal-instructions">
+        <div class="jcb-instruction-step">
+          <span class="jcb-step-num">1</span>
+          <span>Open your phone's camera app.</span>
+        </div>
+        <div class="jcb-instruction-step">
+          <span class="jcb-step-num">2</span>
+          <span>Point it at the QR code above.</span>
+        </div>
+        <div class="jcb-instruction-step">
+          <span class="jcb-step-num">3</span>
+          <span>Tap the link to place the JCB on your floor!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles scoped to the widget root to ensure no layout bleed on external websites -->
+<style>
+  #jcb-ar-widget-root {
+    display: inline-block;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Premium Yellow Brand Button styling */
+  .jcb-ar-premium-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background-color: #fbc02d; /* JCB Yellow */
+    color: #000000;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(251, 192, 45, 0.35);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+  }
+
+  .jcb-ar-premium-btn:hover {
+    background-color: #f9a825;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(251, 192, 45, 0.55);
+  }
+
+  .jcb-ar-premium-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 12px rgba(251, 192, 45, 0.25);
+  }
+
+  .jcb-ar-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.2px;
+  }
+
+  /* Modal Overlay - Sleek glassmorphism */
+  .jcb-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 999999;
+    justify-content: center;
+    align-items: center;
+    animation: jcb-fade-in 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  }
+
+  /* Modal Content Card */
+  .jcb-modal-content {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 400px;
+    padding: 32px;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+    animation: jcb-scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .jcb-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 28px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .jcb-close-btn:hover {
+    color: #ffffff;
+  }
+
+  .jcb-modal-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .jcb-modal-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #a0a0a0;
+    line-height: 1.4;
+  }
+
+  /* QR Code Styling with Neon Glow */
+  .jcb-qr-wrapper {
+    margin: 24px auto;
+    width: 220px;
+    height: 220px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(251, 192, 45, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .jcb-qr-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Stepped Instructions */
+  .jcb-modal-instructions {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .jcb-instruction-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    color: #d0d0d0;
+  }
+
+  .jcb-step-num {
+    background-color: rgba(251, 192, 45, 0.15);
+    color: #fbc02d;
+    font-weight: 700;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    border: 1px solid rgba(251, 192, 45, 0.3);
+  }
+
+  /* Keyframe Animations */
+  @keyframes jcb-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes jcb-scale-up {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
+
+<!-- Widget Logic -->
+<script type="module">
+  // 1. Dynamic Model-Viewer Script Injection (safeguarded against duplicate injections)
+  if (!customElements.get('model-viewer')) {
+    const mvScript = document.createElement('script');
+    mvScript.type = 'module';
+    mvScript.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js';
+    document.head.appendChild(mvScript);
+  }
+
+  // 2. DOM Elements Selection
+  const btn = document.getElementById('jcb-ar-trigger-btn');
+  const viewer = document.getElementById('jcb-hidden-viewer');
+  const modal = document.getElementById('jcb-qr-modal');
+  const closeBtn = document.getElementById('jcb-modal-close');
+
+  // 3. Robust Mobile Device Check
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 4. Click Handler for AR Initiation / Fallback
+  btn.addEventListener('click', () => {
+    if (isMobile) {
+      // Mobile user: Launch direct native AR camera experience
+      if (viewer) {
+        viewer.activateAR();
+      }
+    } else {
+      // Desktop user: Show premium QR Code Modal
+      modal.style.display = 'flex';
+    }
+  });
+
+  // 5. Modal Close Controls
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // Close modal when clicking outside content area
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+</script>

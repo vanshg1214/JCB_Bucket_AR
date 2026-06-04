@@ -1,110 +1,81 @@
 import { NodeIO } from '@gltf-transform/core';
 
-async function inspectAndFix() {
+async function fixModelClean() {
   const io = new NodeIO();
+  // Read the ORIGINAL file (not the broken fixed one)
   const document = await io.read('public/models/scene (29).glb');
   const scene = document.getRoot().getDefaultScene() || document.getRoot().listScenes()[0];
   
-  // Find the global bounding box by traversing all meshes
-  let minY = Infinity;
-  let maxY = -Infinity;
-  let minX = Infinity, maxX = -Infinity;
-  let minZ = Infinity, maxZ = -Infinity;
+  const rootNode = scene.listChildren()[0];
+  const rootScale = rootNode.getScale();
+  const rootTranslation = rootNode.getTranslation();
+  
+  console.log(`Root: "${rootNode.getName()}"`);
+  console.log(`  Scale: [${rootScale.join(', ')}]`);
+  console.log(`  Translation: [${rootTranslation.map(v => v.toFixed(4)).join(', ')}]`);
 
-  function getWorldTranslation(node) {
-    // Walk up the parent chain to accumulate translations
-    let tx = 0, ty = 0, tz = 0;
-    let current = node;
-    while (current) {
-      const t = current.getTranslation();
-      tx += t[0];
-      ty += t[1];
-      tz += t[2];
-      current = current.getParentNode ? current.getParentNode() : null;
-    }
-    return [tx, ty, tz];
-  }
+  // Compute world-space bounding box properly, respecting the full transform chain
+  let minY = Infinity, maxY = -Infinity;
 
-  function traverseNode(node) {
+  function computeWorldBounds(node, parentTx, parentTy, parentTz, parentSx, parentSy, parentSz) {
+    const t = node.getTranslation();
+    const s = node.getScale();
+    
+    // World position = parent_translation + parent_scale * local_translation
+    const worldTx = parentTx + parentSx * t[0];
+    const worldTy = parentTy + parentSy * t[1];
+    const worldTz = parentTz + parentSz * t[2];
+    
+    // World scale = parent_scale * local_scale
+    const worldSx = parentSx * s[0];
+    const worldSy = parentSy * s[1];
+    const worldSz = parentSz * s[2];
+    
     const mesh = node.getMesh();
     if (mesh) {
-      const worldT = getWorldTranslation(node);
       for (const prim of mesh.listPrimitives()) {
         const posAccessor = prim.getAttribute('POSITION');
         if (posAccessor) {
           const posArray = posAccessor.getArray();
           for (let i = 0; i < posArray.length; i += 3) {
-            const wy = posArray[i + 1] + worldT[1];
-            const wx = posArray[i] + worldT[0];
-            const wz = posArray[i + 2] + worldT[2];
+            const wy = worldTy + worldSy * posArray[i + 1];
             if (wy < minY) minY = wy;
             if (wy > maxY) maxY = wy;
-            if (wx < minX) minX = wx;
-            if (wx > maxX) maxX = wx;
-            if (wz < minZ) minZ = wz;
-            if (wz > maxZ) maxZ = wz;
           }
         }
       }
     }
+    
     for (const child of node.listChildren()) {
-      traverseNode(child);
+      computeWorldBounds(child, worldTx, worldTy, worldTz, worldSx, worldSy, worldSz);
     }
   }
 
-  for (const node of scene.listChildren()) {
-    traverseNode(node);
-  }
+  computeWorldBounds(rootNode, 0, 0, 0, 1, 1, 1);
 
-  console.log('=== Model Bounding Box ===');
-  console.log(`X: ${minX.toFixed(4)} to ${maxX.toFixed(4)} (width: ${(maxX - minX).toFixed(4)})`);
-  console.log(`Y: ${minY.toFixed(4)} to ${maxY.toFixed(4)} (height: ${(maxY - minY).toFixed(4)})`);
-  console.log(`Z: ${minZ.toFixed(4)} to ${maxZ.toFixed(4)} (depth: ${(maxZ - minZ).toFixed(4)})`);
-  console.log(`\nThe bottom of the model (minY) is at: ${minY.toFixed(4)}`);
-  console.log(`Need to shift Y by: ${(-minY).toFixed(4)} to place tires on floor`);
+  console.log(`\nWorld-space Y range: ${minY.toFixed(4)} to ${maxY.toFixed(4)}`);
+  console.log(`Height: ${(maxY - minY).toFixed(4)} m`);
+  console.log(`Bottom (minY): ${minY.toFixed(4)} m`);
 
-  // Now shift all root-level nodes so minY becomes 0
-  const offsetY = -minY;
-  // Also center on X and Z
-  const centerX = (minX + maxX) / 2;
-  const centerZ = (minZ + maxZ) / 2;
+  // To move the bottom to Y=0, we need to adjust the ROOT node translation.
+  // Since the root has scale 50, and world_y = root_ty + 50 * local_vertex_y,
+  // we just need to set root_ty so that minY becomes 0.
+  // new_root_ty = root_ty - minY  (shifting everything up by |minY|)
+  const newRootTy = rootTranslation[1] - minY;
   
-  console.log(`\nApplying offset: X=${(-centerX).toFixed(4)}, Y=${offsetY.toFixed(4)}, Z=${(-centerZ).toFixed(4)}`);
+  console.log(`\nOld root translation Y: ${rootTranslation[1].toFixed(4)}`);
+  console.log(`New root translation Y: ${newRootTy.toFixed(4)}`);
 
-  for (const node of scene.listChildren()) {
-    const t = node.getTranslation();
-    node.setTranslation([
-      t[0] - centerX,
-      t[1] + offsetY,
-      t[2] - centerZ
-    ]);
-  }
+  rootNode.setTranslation([rootTranslation[0], newRootTy, rootTranslation[2]]);
 
   // Verify
-  let newMinY = Infinity;
-  for (const node of scene.listChildren()) {
-    const mesh = node.getMesh();
-    if (mesh) {
-      const worldT = getWorldTranslation(node);
-      for (const prim of mesh.listPrimitives()) {
-        const posAccessor = prim.getAttribute('POSITION');
-        if (posAccessor) {
-          const posArray = posAccessor.getArray();
-          for (let i = 0; i < posArray.length; i += 3) {
-            const wy = posArray[i + 1] + worldT[1];
-            if (wy < newMinY) newMinY = wy;
-          }
-        }
-      }
-    }
-    for (const child of node.listChildren()) {
-      traverseNode(child);
-    }
-  }
-  console.log(`\nVerification - New minY: ${newMinY.toFixed(4)} (should be ~0)`);
+  minY = Infinity; maxY = -Infinity;
+  computeWorldBounds(rootNode, 0, 0, 0, 1, 1, 1);
+  console.log(`\nVerification - Y range: ${minY.toFixed(4)} to ${maxY.toFixed(4)} (height: ${(maxY - minY).toFixed(4)} m)`);
+  console.log(`Bottom should be ~0: ${minY.toFixed(4)}`);
 
   await io.write('public/models/scene_fixed.glb', document);
-  console.log('\nDone! Saved to scene_fixed.glb');
+  console.log('\nDone! Saved with corrected origin (scale preserved).');
 }
 
-inspectAndFix().catch(console.error);
+fixModelClean().catch(console.error);

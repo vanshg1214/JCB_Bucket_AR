@@ -3,27 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JCB Web AR Service</title>
+    <title>JCB Bucket Web AR</title>
   </head>
   <body>
     <div id="app">
       <header class="app-header">
-        <h1>JCB Product Demo</h1>
-        <p>Zero-Configuration Web AR Experience</p>
+        <h1>JCB Bucket Configurator</h1>
+        <p>WebAR Experience</p>
       </header>
       
       <main class="product-card">
         <model-viewer
-          src="/models/scene_fixed.glb"
+          src="models/scene_fixed.glb"
           ar
           ar-modes="scene-viewer quick-look"
           ar-scale="fixed"
           ar-placement="floor"
           camera-controls
           touch-action="pan-y"
-          shadow-intensity="0"
-          alt="JCB 435B Loader in AR"
+          shadow-intensity="1.5"
+          shadow-softness="0.5"
+          auto-rotate
+          alt="JCB Bucket in AR"
         >
+          <div slot="poster" class="loading-overlay">
+            <div class="spinner-container">
+              <div class="jcb-spinner"></div>
+              <p class="loading-text">Loading 3D JCB Bucket...</p>
+            </div>
+          </div>
           <button slot="ar-button" class="ar-button">
             View in your space
           </button>

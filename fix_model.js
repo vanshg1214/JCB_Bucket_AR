@@ -3,7 +3,7 @@ import { NodeIO } from '@gltf-transform/core';
 async function fixModelClean() {
   const io = new NodeIO();
   // Read the ORIGINAL file (not the broken fixed one)
-  const document = await io.read('public/models/scene (29).glb');
+  const document = await io.read('public/models/scene (31).glb');
   const scene = document.getRoot().getDefaultScene() || document.getRoot().listScenes()[0];
   
   const rootNode = scene.listChildren()[0];

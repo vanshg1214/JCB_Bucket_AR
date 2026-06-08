@@ -74,8 +74,30 @@ async function fixModelClean() {
   console.log(`\nVerification - Y range: ${minY.toFixed(4)} to ${maxY.toFixed(4)} (height: ${(maxY - minY).toFixed(4)} m)`);
   console.log(`Bottom should be ~0: ${minY.toFixed(4)}`);
 
+  // ---- ENHANCE METALLIC FEEL ----
+  const materials = document.getRoot().listMaterials();
+  console.log('\n--- Enhancing Materials for Metallic Feel ---');
+  materials.forEach((mat, i) => {
+    let r = mat.getRoughnessFactor();
+    let m = mat.getMetallicFactor();
+    
+    // Reduce roughness by 40% to make the metal much shinier and crisper
+    let newR = r * 0.6;
+    if (newR < 0.15) newR = 0.15; // cap to avoid mirror reflection
+    
+    // Boost metallic on the yellow paint (Material 4: 08_-_Default) and others
+    let newM = m;
+    if (m > 0.3 && m < 1.0) {
+      newM = Math.min(1.0, m + 0.3);
+    }
+    
+    mat.setRoughnessFactor(newR);
+    mat.setMetallicFactor(newM);
+    console.log(`"${mat.getName()}" -> Roughness: ${r.toFixed(2)} to ${newR.toFixed(2)} | Metallic: ${m.toFixed(2)} to ${newM.toFixed(2)}`);
+  });
+
   await io.write('public/models/scene_fixed.glb', document);
-  console.log('\nDone! Saved with corrected origin (scale preserved).');
+  console.log('\nDone! Saved with corrected origin and enhanced metallic materials.');
 }
 
 fixModelClean().catch(console.error);

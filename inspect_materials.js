@@ -11,6 +11,10 @@ async function inspectMaterials() {
     console.log(`  Metallic Factor: ${mat.getMetallicFactor()}`);
     console.log(`  Roughness Factor: ${mat.getRoughnessFactor()}`);
     console.log(`  Base Color Factor: ${mat.getBaseColorFactor()}`);
+    console.log(`  Base Color Texture: ${mat.getBaseColorTexture() ? mat.getBaseColorTexture().getName() : 'none'}`);
+    console.log(`  Metallic Roughness Texture: ${mat.getMetallicRoughnessTexture() ? mat.getMetallicRoughnessTexture().getName() : 'none'}`);
+    console.log(`  Normal Texture: ${mat.getNormalTexture() ? mat.getNormalTexture().getName() : 'none'}`);
+    console.log(`  Occlusion Texture: ${mat.getOcclusionTexture() ? mat.getOcclusionTexture().getName() : 'none'}`);
   });
 }
 

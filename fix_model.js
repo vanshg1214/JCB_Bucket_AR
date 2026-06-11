@@ -3,7 +3,7 @@ import { NodeIO } from '@gltf-transform/core';
 async function fixModelClean() {
   const io = new NodeIO();
   // Read the ORIGINAL file (not the broken fixed one)
-  const document = await io.read('public/models/scene (31).glb');
+  const document = await io.read('public/models/Bucket.glb');
   const scene = document.getRoot().getDefaultScene() || document.getRoot().listScenes()[0];
   
   const rootNode = scene.listChildren()[0];
@@ -81,8 +81,8 @@ async function fixModelClean() {
     let r = mat.getRoughnessFactor();
     let m = mat.getMetallicFactor();
     
-    // Reduce roughness by 40% to make the metal much shinier and crisper
-    let newR = r * 0.6;
+    // Reduce roughness by 75% to make the metal much shinier and crisper (highly metallic feel)
+    let newR = r * 0.25;
     if (newR < 0.15) newR = 0.15; // cap to avoid mirror reflection
     
     // Boost metallic on the yellow paint (Material 4: 08_-_Default) and others

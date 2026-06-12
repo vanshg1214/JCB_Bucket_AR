@@ -79,7 +79,7 @@ body {
 
 model-viewer {
   width: 100%;
-  height: 500px;
+  height: 650px;
   border-radius: 16px;
   background-color: transparent;
   position: relative;
@@ -91,9 +91,9 @@ model-viewer {
   color: #000;
   border: none;
   border-radius: 30px;
-  padding: 12px 24px;
+  padding: 8px 16px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
   position: absolute;
   bottom: 24px;
@@ -103,7 +103,7 @@ model-viewer {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ar-button:hover {
@@ -120,8 +120,8 @@ model-viewer {
 .ar-button::before {
   content: '';
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>');
   background-size: contain;
   background-repeat: no-repeat;
@@ -142,7 +142,7 @@ model-viewer:not([ar-status]) .ar-button {
 
 @media (max-width: 768px) {
   model-viewer {
-    height: 400px;
+    height: 500px;
   }
   
   .app-header h1 {

@@ -127,12 +127,6 @@ model-viewer {
   background-repeat: no-repeat;
 }
 
-/* Hide AR button when not supported (model-viewer handles this natively sometimes, but good to be explicit if needed) */
-model-viewer:not([ar-status]) .ar-button {
-  /* It is recommended to rely on model-viewer's default hiding if AR isn't supported, 
-     but you can style it conditionally if desired */
-}
-
 .app-footer {
   text-align: center;
   color: var(--text-muted);
@@ -208,76 +202,182 @@ model-viewer:not([ar-status]) .ar-button {
   }
 }
 
-/* Minimal Hotspot Styles */
+/* Premium Glassmorphic Hotspots & Cards */
 .Hotspot {
   background: var(--primary);
   border-radius: 50%;
   border: 2px solid #000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   cursor: pointer;
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width: 28px;
   position: relative;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: scale(var(--camera-scale, 1));
+  transform-origin: center center;
+  z-index: 100;
 }
 
 .Hotspot:not([data-visible]) {
   background: transparent;
   border: 2px solid var(--primary);
-  opacity: 0.5;
+  opacity: 0.3;
   pointer-events: none;
 }
 
 .Hotspot:focus {
-  border: 2px solid #fff;
-  height: 36px;
   outline: none;
-  width: 36px;
 }
 
 .Hotspot::after {
   content: "i";
   font-family: var(--font-family);
-  font-weight: bold;
-  font-size: 16px;
-  color: #000;
-}
-
-.HotspotAnnotation {
-  background: rgba(18, 18, 18, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: var(--text-main);
-  display: block;
-  font-family: var(--font-family);
-  font-size: 13px;
-  left: calc(100% + 1em);
-  padding: 8px 12px;
-  position: absolute;
-  top: 50%;
-  width: max-content;
-  transform: translateY(-50%) scale(0.9);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
-  z-index: 10;
-}
-
-.HotspotAnnotation strong {
-  display: block;
-  color: var(--primary);
-  margin-bottom: 2px;
+  font-weight: 800;
   font-size: 14px;
+  color: #000;
+  transition: color 0.3s;
 }
 
-.Hotspot:hover .HotspotAnnotation,
-.Hotspot:focus .HotspotAnnotation {
+/* Outer Pulsing Glow Ring for Active State */
+.Hotspot::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.Hotspot.active::before {
+  animation: hotspot-pulse 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
   opacity: 1;
+}
+
+@keyframes hotspot-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Active & Hover Highlights */
+.Hotspot:hover {
+  transform: scale(calc(var(--camera-scale, 1) * 1.2));
+  background-color: var(--primary-hover);
+  box-shadow: 0 0 16px rgba(251, 192, 45, 0.6);
+}
+
+.Hotspot.active {
+  background-color: #000;
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(251, 192, 45, 0.4);
+}
+
+.Hotspot.active::after {
+  color: var(--primary);
+}
+
+/* Dim Inactive Hotspots */
+model-viewer.has-active-hotspot .Hotspot:not(.active) {
+  opacity: 0.2;
+  box-shadow: none;
+}
+
+/* Glassmorphic Hotspot Card */
+.HotspotAnnotation {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.95);
+  transform-origin: bottom center;
+  width: 290px;
+  background: rgba(18, 18, 18, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  color: var(--text-main);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.3s;
+  text-align: left;
+  z-index: 1000;
+}
+
+.HotspotAnnotation::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: rgba(18, 18, 18, 0.82) transparent transparent transparent;
+}
+
+.Hotspot.active .HotspotAnnotation {
+  opacity: 1;
+  pointer-events: auto;
   visibility: visible;
-  transform: translateY(-50%) scale(1);
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Header inside card */
+.HotspotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+}
+
+.HotspotHeader h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.HotspotClose {
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  line-height: 1;
+  padding: 0 4px;
+  margin-top: -4px;
+}
+
+.HotspotClose:hover {
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* Content inside card */
+.HotspotAnnotation p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 400;
 }

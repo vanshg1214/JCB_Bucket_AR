@@ -2,7 +2,7 @@ import { NodeIO } from '@gltf-transform/core';
 
 async function inspectFullTree() {
   const io = new NodeIO();
-  const document = await io.read('public/models/scene (29).glb');
+  const document = await io.read('public/models/scene_fixed.glb');
   const scene = document.getRoot().getDefaultScene() || document.getRoot().listScenes()[0];
 
   function printNode(node, depth) {

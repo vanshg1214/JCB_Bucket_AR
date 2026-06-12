@@ -61,6 +61,9 @@ function activateHotspot(hotspot) {
   hotspot.classList.add('active');
   modelViewer.classList.add('has-active-hotspot');
   
+  // Stop auto-rotation to keep the info card text perfectly stable
+  modelViewer.autoRotate = false;
+  
   // Smoothly transition camera target to focus attention on this part
   const position = hotspot.getAttribute('data-position');
   if (position) {
@@ -71,6 +74,9 @@ function activateHotspot(hotspot) {
 function deactivateAllHotspots() {
   hotspots.forEach(h => h.classList.remove('active'));
   modelViewer.classList.remove('has-active-hotspot');
+  
+  // Resume auto-rotation when no hotspots are active
+  modelViewer.autoRotate = true;
   
   // Reset camera target to default model center
   modelViewer.cameraTarget = defaultTarget;

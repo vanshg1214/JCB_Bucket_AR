@@ -28,7 +28,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .app-header {
@@ -60,7 +60,7 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.08);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Add a subtle glow behind the 3D model */
@@ -135,12 +135,122 @@ model-viewer {
 }
 
 @media (max-width: 768px) {
-  model-viewer {
-    height: 500px;
+  #app {
+    padding: 1rem 0.75rem;
+    gap: 1rem;
   }
-  
+
   .app-header h1 {
-    font-size: 2rem;
+    font-size: 1.6rem;
+  }
+
+  .app-header p {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  .product-card {
+    border-radius: 16px;
+    padding: 0.5rem;
+  }
+
+  model-viewer {
+    height: 420px;
+    border-radius: 12px;
+  }
+
+  .ar-button {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    border-radius: 24px;
+    bottom: 14px;
+    gap: 5px;
+  }
+
+  .ar-button::before {
+    width: 13px;
+    height: 13px;
+  }
+
+  .jcb-spinner {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+
+  .loading-text {
+    font-size: 0.85rem;
+  }
+
+  .spinner-container {
+    gap: 10px;
+  }
+
+  .app-footer {
+    font-size: 0.75rem;
+  }
+
+  .app-footer p {
+    margin: 0;
+  }
+
+  /* Hotspot button sizing for mobile */
+  .Hotspot {
+    height: 32px;
+    width: 32px;
+    border-width: 1.5px;
+  }
+
+  .Hotspot::after {
+    font-size: 15px;
+  }
+
+  .Hotspot::before {
+    top: -7px;
+    left: -7px;
+    right: -7px;
+    bottom: -7px;
+  }
+
+  /* Info card sizing for mobile */
+  .HotspotAnnotation {
+    width: min(300px, calc(100vw - 32px));
+    padding: 14px;
+    border-radius: 10px;
+    bottom: calc(100% + 12px);
+  }
+
+  .HotspotHeader {
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+  }
+
+  .HotspotHeader h3 {
+    font-size: 1rem;
+  }
+
+  .HotspotClose {
+    font-size: 1.4rem;
+  }
+
+  .HotspotAnnotation p {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .HotspotMaterial {
+    margin-top: 8px;
+    padding-top: 8px;
+    gap: 4px;
+  }
+
+  .MaterialLabel {
+    font-size: 0.65rem;
+  }
+
+  .MaterialValue {
+    font-size: 0.78rem;
+    padding: 3px 8px;
   }
 }
 
@@ -305,7 +415,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   transform: translateX(-50%) translateY(10px) scale(0.95);
   transform-origin: bottom center;
   width: min(490px, calc(100vw - 40px));
-  background: rgba(18, 18, 18, 0.82);
+  background: rgba(18, 18, 18, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -321,6 +431,23 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   z-index: 1000;
 }
 
+/* Flipped variant: card opens BELOW the hotspot when there's no room above */
+.Hotspot.flipped .HotspotAnnotation {
+  bottom: auto;
+  top: calc(100% + 18px);
+  transform-origin: top center;
+}
+
+.Hotspot.flipped.active .HotspotAnnotation {
+  transform: translateX(calc(-50% + var(--shift-x, 0px))) translateY(0) scale(1);
+}
+
+.Hotspot.flipped .HotspotAnnotation::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(18, 18, 18, 0.88) transparent;
+}
+
 .HotspotAnnotation::after {
   content: '';
   position: absolute;
@@ -329,7 +456,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   transform: translateX(-50%);
   border-width: 10px;
   border-style: solid;
-  border-color: rgba(18, 18, 18, 0.82) transparent transparent transparent;
+  border-color: rgba(18, 18, 18, 0.88) transparent transparent transparent;
 }
 
 .Hotspot.active .HotspotAnnotation {

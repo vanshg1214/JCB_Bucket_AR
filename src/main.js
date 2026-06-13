@@ -54,6 +54,8 @@ function activateHotspot(hotspot) {
   hotspots.forEach(h => {
     if (h !== hotspot) {
       h.classList.remove('active');
+      h.classList.remove('flipped');
+      h.style.setProperty('--shift-x', '0px');
     }
   });
   
@@ -70,36 +72,58 @@ function activateHotspot(hotspot) {
     modelViewer.cameraTarget = position;
   }
   
-  // Ensure the annotation doesn't overflow the model-viewer bounds
-  setTimeout(() => {
-    const annotation = hotspot.querySelector('.HotspotAnnotation');
-    if (!annotation) return;
-    
-    // Reset shift to measure properly
-    hotspot.style.setProperty('--shift-x', '0px');
-    
-    const viewerRect = modelViewer.getBoundingClientRect();
-    const annRect = annotation.getBoundingClientRect();
-    
-    let shiftX = 0;
-    
-    // Check right overflow
-    if (annRect.right > viewerRect.right - 10) {
-      shiftX = viewerRect.right - 10 - annRect.right; // negative shift
-    } 
-    // Check left overflow
-    else if (annRect.left < viewerRect.left + 10) {
-      shiftX = viewerRect.left + 10 - annRect.left; // positive shift
-    }
-    
-    if (shiftX !== 0) {
-      hotspot.style.setProperty('--shift-x', `${shiftX}px`);
-    }
-  }, 50); // wait for scale and display transitions to start
+  // Position the card so it doesn't clip
+  requestAnimationFrame(() => {
+    setTimeout(() => positionAnnotation(hotspot), 60);
+  });
+}
+
+/**
+ * Measures the annotation card against the model-viewer bounds and
+ * applies horizontal shift + vertical flip as needed.
+ */
+function positionAnnotation(hotspot) {
+  const annotation = hotspot.querySelector('.HotspotAnnotation');
+  if (!annotation) return;
+  
+  // Reset transforms to measure cleanly
+  hotspot.style.setProperty('--shift-x', '0px');
+  hotspot.classList.remove('flipped');
+  
+  const viewerRect = modelViewer.getBoundingClientRect();
+  
+  // Force a reflow so we measure the un-flipped position
+  void annotation.offsetHeight;
+  let annRect = annotation.getBoundingClientRect();
+  
+  // --- Vertical: flip below if the card goes above the viewer ---
+  if (annRect.top < viewerRect.top + 5) {
+    hotspot.classList.add('flipped');
+    // re-measure after flipping
+    void annotation.offsetHeight;
+    annRect = annotation.getBoundingClientRect();
+  }
+  
+  // --- Horizontal: shift left/right if it overflows the sides ---
+  let shiftX = 0;
+  
+  if (annRect.right > viewerRect.right - 8) {
+    shiftX = viewerRect.right - 8 - annRect.right;
+  } else if (annRect.left < viewerRect.left + 8) {
+    shiftX = viewerRect.left + 8 - annRect.left;
+  }
+  
+  if (shiftX !== 0) {
+    hotspot.style.setProperty('--shift-x', `${shiftX}px`);
+  }
 }
 
 function deactivateAllHotspots() {
-  hotspots.forEach(h => h.classList.remove('active'));
+  hotspots.forEach(h => {
+    h.classList.remove('active');
+    h.classList.remove('flipped');
+    h.style.setProperty('--shift-x', '0px');
+  });
   modelViewer.classList.remove('has-active-hotspot');
   
   // Resume auto-rotation when no hotspots are active
@@ -110,18 +134,24 @@ function deactivateAllHotspots() {
 }
 
 // Scale hotspots based on camera distance (orbit radius)
+// and re-position the active annotation to prevent clipping during rotation.
 modelViewer.addEventListener('camera-change', () => {
   try {
     const orbit = modelViewer.getCameraOrbit();
     const radius = orbit.radius;
     
     // Keep hotspot visual scale stable and readable relative to zoom depth.
-    // scale increases slightly as camera zooms in, and decreases as camera zooms out.
     const scale = Math.max(0.55, Math.min(1.3, 1.2 / radius));
     
     hotspots.forEach(hotspot => {
       hotspot.style.setProperty('--camera-scale', scale);
     });
+    
+    // Re-position the active annotation so it doesn't clip when the user orbits
+    const activeHotspot = document.querySelector('.Hotspot.active');
+    if (activeHotspot) {
+      positionAnnotation(activeHotspot);
+    }
   } catch (e) {
     // Graceful fallback if getCameraOrbit is not ready
   }

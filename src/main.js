@@ -69,6 +69,33 @@ function activateHotspot(hotspot) {
   if (position) {
     modelViewer.cameraTarget = position;
   }
+  
+  // Ensure the annotation doesn't overflow the model-viewer bounds
+  setTimeout(() => {
+    const annotation = hotspot.querySelector('.HotspotAnnotation');
+    if (!annotation) return;
+    
+    // Reset shift to measure properly
+    hotspot.style.setProperty('--shift-x', '0px');
+    
+    const viewerRect = modelViewer.getBoundingClientRect();
+    const annRect = annotation.getBoundingClientRect();
+    
+    let shiftX = 0;
+    
+    // Check right overflow
+    if (annRect.right > viewerRect.right - 10) {
+      shiftX = viewerRect.right - 10 - annRect.right; // negative shift
+    } 
+    // Check left overflow
+    else if (annRect.left < viewerRect.left + 10) {
+      shiftX = viewerRect.left + 10 - annRect.left; // positive shift
+    }
+    
+    if (shiftX !== 0) {
+      hotspot.style.setProperty('--shift-x', `${shiftX}px`);
+    }
+  }, 50); // wait for scale and display transitions to start
 }
 
 function deactivateAllHotspots() {

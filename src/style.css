@@ -210,8 +210,8 @@ model-viewer {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   cursor: pointer;
-  height: 36px;
-  width: 36px;
+  height: 47px;
+  width: 47px;
   position: relative;
   transition: opacity 0.3s, transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
   display: flex;
@@ -237,7 +237,7 @@ model-viewer {
   content: "i";
   font-family: var(--font-family);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 23px;
   color: #000;
   transition: color 0.3s;
 }
@@ -304,7 +304,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   left: 50%;
   transform: translateX(-50%) translateY(10px) scale(0.95);
   transform-origin: bottom center;
-  width: 380px;
+  width: min(490px, calc(100vw - 40px));
   background: rgba(18, 18, 18, 0.82);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -325,7 +325,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: calc(50% - var(--shift-x, 0px));
   transform: translateX(-50%);
   border-width: 10px;
   border-style: solid;
@@ -336,7 +336,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateX(calc(-50% + var(--shift-x, 0px))) translateY(0) scale(1);
 }
 
 /* Header inside card */
@@ -351,7 +351,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
 
 .HotspotHeader h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.625rem;
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.01em;
@@ -376,7 +376,7 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
 /* Content inside card */
 .HotspotAnnotation p {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.365rem;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.82);
   font-weight: 400;
@@ -398,13 +398,13 @@ model-viewer.has-active-hotspot .Hotspot:not(.active) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 0.8rem;
+  font-size: 1.04rem;
 }
 
 .MaterialValue {
   color: var(--primary);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.235rem;
   background: rgba(251, 192, 45, 0.08);
   padding: 4px 10px;
   border-radius: 6px;
